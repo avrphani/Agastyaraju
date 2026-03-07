@@ -1,11 +1,92 @@
-﻿[
-  {"id":1,"src":"images/1.jpeg","price":1000,"S":1,"M":1,"L":2,"XL":1},
-  {"id":2,"src":"images/2.jpeg","price":1100,"S":2,"M":2,"L":2,"XL":2},
-  {"id":3,"src":"images/3.jpeg","price":1200,"S":3,"M":3,"L":2,"XL":3},
-  {"id":4,"src":"images/4.jpeg","price":1300,"S":4,"M":4,"L":2,"XL":4},
-  {"id":5,"src":"images/5.jpeg","price":1500,"S":5,"M":5,"L":2,"XL":5},
-  {"id":6,"src":"images/6.jpeg","price":1400,"S":6,"M":6,"L":2,"XL":6},
-  {"id":7,"src":"images/7.jpeg","price":1600,"S":7,"M":7,"L":2,"XL":7},
-  {"id":8,"src":"images/8.jpeg","price":1700,"S":8,"M":8,"L":2,"XL":8},
-  {"id":9,"src":"images/9.jpeg","price":1800,"S":9,"M":9,"L":2,"XL":9}
+[
+  {
+    "id": 1,
+    "src": "images/1.jpeg",
+    "price": 1000,
+    "S": 1,
+    "M": 1,
+    "L": 2,
+    "XL": 1
+  },
+  {
+    "id": 2,
+    "src": "images/2.jpeg",
+    "price": 1100,
+    "S": 2,
+    "M": 2,
+    "L": 2,
+    "XL": 2
+  },
+  {
+    "id": 3,
+    "src": "images/3.jpeg",
+    "price": 1200,
+    "S": 3,
+    "M": 3,
+    "L": 2,
+    "XL": 3
+  },
+  {
+    "id": 4,
+    "src": "images/4.jpeg",
+    "price": 1300,
+    "S": 4,
+    "M": 4,
+    "L": 2,
+    "XL": 4
+  },
+  {
+    "id": 5,
+    "src": "images/5.jpeg",
+    "price": 1500,
+    "S": 5,
+    "M": 5,
+    "L": 2,
+    "XL": 5
+  },
+  {
+    "id": 6,
+    "src": "images/6.jpeg",
+    "price": 1400,
+    "S": 6,
+    "M": 6,
+    "L": 2,
+    "XL": 6
+  },
+  {
+    "id": 7,
+    "src": "images/7.jpeg",
+    "price": 1600,
+    "S": 7,
+    "M": 7,
+    "L": 2,
+    "XL": 7
+  },
+  {
+    "id": 8,
+    "src": "images/8.jpeg",
+    "price": 1700,
+    "S": 8,
+    "M": 8,
+    "L": 2,
+    "XL": 8
+  },
+  {
+    "id": 9,
+    "src": "images/9.jpeg",
+    "price": 1800,
+    "S": 9,
+    "M": 9,
+    "L": 2,
+    "XL": 9
+  },
+  {
+    "id": 10,
+    "src": "images/10.jpeg",
+    "price": 800,
+    "S": 1,
+    "M": 0,
+    "L": 0,
+    "XL": 1
+  }
 ]

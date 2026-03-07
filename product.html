@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Product — Agastyaraju</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<nav>
+  <a href="/" class="nav-logo">Agastya<span>raju</span></a>
+  <div class="nav-tagline">Women's Fashion</div>
+</nav>
+
+<main class="product-page" id="product-page">
+  <div style="text-align:center;padding:5rem 2rem;color:var(--muted);font-style:italic">
+    Loading product…
+  </div>
+</main>
+
+<footer>
+  <div class="footer-logo">Agastya<span>raju</span></div>
+  <div class="footer-copy">© 2026 Agastyaraju — Women's Fashion. All rights reserved.</div>
+</footer>
+
+<script>
+(async () => {
+  const params  = new URLSearchParams(window.location.search);
+  const id      = parseInt(params.get('id'));
+  const page    = document.getElementById('product-page');
+
+  let data;
+  try {
+    const res = await fetch('images_data.json?t=' + Date.now());
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    data = await res.json();
+  } catch (e) {
+    page.innerHTML = `<p style="color:#c04040;text-align:center;padding:5rem">Could not load product: ${e.message}</p>`;
+    return;
+  }
+
+  const product = data.find(p => p.id === id);
+  if (!product) {
+    page.innerHTML = `<p style="text-align:center;padding:5rem;color:var(--muted)">Product not found. <a href="/" style="color:var(--rose)">← Back to Collection</a></p>`;
+    return;
+  }
+
+  document.title = `Style ${product.id} — Agastyaraju`;
+
+  const sizes = [
+    { label: 'S',  stock: product.S  || 0 },
+    { label: 'M',  stock: product.M  || 0 },
+    { label: 'L',  stock: product.L  || 0 },
+    { label: 'XL', stock: product.XL || 0 },
+  ];
+  const anyInStock = sizes.some(s => s.stock > 0);
+
+  page.innerHTML = `
+    <div class="pd-breadcrumb">
+      <a href="/">Collection</a> &rsaquo; <span>Style ${product.id}</span>
+    </div>
+
+    <div class="pd-layout">
+
+      <!-- LEFT: IMAGE -->
+      <div class="pd-image-panel">
+        <img id="pd-main-img" src="${product.src}" alt="Style ${product.id}" />
+      </div>
+
+      <!-- RIGHT: DETAILS -->
+      <div class="pd-info-panel">
+
+        <div class="pd-brand">Agastyaraju</div>
+        <h1 class="pd-title">Women's Ethnic Wear &mdash; <em>Style ${product.id}</em></h1>
+
+        <hr class="pd-divider" />
+
+        <!-- PRICE -->
+        <div class="pd-price-row">
+          <span class="pd-price">&#8377;${product.price.toLocaleString('en-IN')}</span>
+          <span class="pd-price-label">MRP</span>
+        </div>
+        <p class="pd-price-note">Inclusive of all taxes &bull; Free delivery on prepaid orders</p>
+
+        <hr class="pd-divider" />
+
+        <!-- SIZE SELECTOR -->
+        <div class="pd-size-section">
+          <div class="pd-size-header">
+            <span class="pd-size-label">Select Size</span>
+          </div>
+          <div class="pd-size-pills" id="pd-size-pills">
+            ${sizes.map(s => `
+              <button
+                class="pd-size-pill ${s.stock > 0 ? 'available' : 'oos'}"
+                data-size="${s.label}"
+                data-stock="${s.stock}"
+                ${s.stock === 0 ? 'disabled' : ''}
+              >${s.label}</button>
+            `).join('')}
+          </div>
+          <div class="pd-size-note" id="pd-size-note">
+            ${anyInStock
+              ? '<span style="color:var(--muted)">Tap a size to check availability</span>'
+              : '<span style="color:#c04040">Currently out of stock in all sizes</span>'}
+          </div>
+        </div>
+
+        <!-- STOCK TABLE -->
+        <div class="pd-stock-table-wrap">
+          <table class="pd-stock-table">
+            <thead>
+              <tr>
+                <th>Size</th>
+                <th>Qty in Stock</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${sizes.map(s => `
+                <tr>
+                  <td class="td-size">${s.label}</td>
+                  <td class="td-qty">${s.stock}</td>
+                  <td class="td-status">
+                    ${s.stock > 5
+                      ? `<span class="badge badge-ok">&#10003; In Stock</span>`
+                      : s.stock > 0
+                      ? `<span class="badge badge-low">Only ${s.stock} left</span>`
+                      : `<span class="badge badge-oos">Out of Stock</span>`
+                    }
+                  </td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+
+        <!-- HIGHLIGHTS -->
+        <ul class="pd-highlights">
+          <li><span class="hi">&#10022;</span> Free returns within 7 days</li>
+          <li><span class="hi">&#10022;</span> Hand-wash recommended</li>
+          <li><span class="hi">&#10022;</span> 100% authentic fabric</li>
+          <li><span class="hi">&#10022;</span> Ships within 2–3 business days</li>
+        </ul>
+
+        <!-- BACK LINK -->
+        <div class="pd-actions">
+          <a href="/" class="btn-back-collection">&#8592; Back to Collection</a>
+        </div>
+
+      </div><!-- /pd-info-panel -->
+    </div><!-- /pd-layout -->
+  `;
+
+  // Size pill selection
+  document.querySelectorAll('.pd-size-pill.available').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.pd-size-pill').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      const stock = parseInt(btn.dataset.stock);
+      const note  = document.getElementById('pd-size-note');
+      if (stock <= 3) {
+        note.innerHTML = `<span style="color:#c07030;font-weight:500">⚠ Only ${stock} left in size ${btn.dataset.size}!</span>`;
+      } else {
+        note.innerHTML = `<span style="color:#3a7d55;font-weight:500">&#10003; ${stock} available in size ${btn.dataset.size}</span>`;
+      }
+    });
+  });
+})();
+</script>
+</body>
+</html>

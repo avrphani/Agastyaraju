@@ -49,12 +49,15 @@
     .admin-header h1 { font-size: 1.4rem; font-weight: 600; color: var(--dark); }
     .admin-actions { display: flex; gap: 0.75rem; }
 
-    .btn-add {
-      background: white; border: 1.5px solid var(--rose); color: var(--rose);
+    .btn-add, .btn-save {
       padding: 0.6rem 1.2rem; border-radius: 0.5rem; font-size: 0.88rem;
       font-weight: 500; cursor: pointer; transition: all 0.2s;
     }
-    .btn-add:hover { background: var(--rose); color: white; }
+    .btn-add  { background: white; border: 1.5px solid var(--rose);  color: var(--rose); }
+    .btn-add:hover  { background: var(--rose);        color: white; }
+    .btn-save { background: var(--green); border: 1.5px solid var(--green); color: white; }
+    .btn-save:hover { background: #2d6343; border-color: #2d6343; }
+    .btn-save:disabled { opacity: 0.6; cursor: not-allowed; }
 
     /* STATUS BAR */
     .status-bar {
@@ -62,8 +65,9 @@
       font-size: 0.88rem; font-weight: 500; display: none;
     }
     .status-bar.visible { display: block; }
-    .status-info  { background: #e8f0fe; color: var(--blue); border: 1px solid #b8d0fc; }
-    .status-error { background: #fde8e8; color: var(--red);  border: 1px solid #f8b8b8; }
+    .status-info    { background: #e8f0fe; color: var(--blue);  border: 1px solid #b8d0fc; }
+    .status-error   { background: #fde8e8; color: var(--red);   border: 1px solid #f8b8b8; }
+    .status-success { background: #e8f6ee; color: var(--green); border: 1px solid #a8d8bc; }
 
     /* TABLE */
     .table-wrap {
@@ -129,6 +133,7 @@
     <h1>Product Catalogue</h1>
     <div class="admin-actions">
       <button class="btn-add" id="add-row">+ Add Product</button>
+      <button class="btn-save" id="save-btn">💾 Save Changes</button>
     </div>
   </div>
 
@@ -139,7 +144,7 @@
       <thead>
         <tr>
           <th>Preview</th>
-          <th>Image #</th>
+          <th>Image File</th>
           <th>Price (₹)</th>
           <th>S</th>
           <th>M</th>
@@ -183,16 +188,18 @@
     if (!item.src) thumb.classList.add('preview-thumb-empty');
     previewTd.appendChild(thumb);
 
-    // Image number input
+    // Image filename input (alphanumeric, e.g. 1.jpeg or sareeRed.jpeg)
     const imgTd    = document.createElement('td');
     const imgInput = document.createElement('input');
-    imgInput.type  = 'number';
-    imgInput.min   = 1;
-    imgInput.className = 'img-num';
-    imgInput.value = item.id || '';
+    const fileFromSrc = item.src ? item.src.replace(/^images\//, '') : '';
+    imgInput.type        = 'text';
+    imgInput.className   = 'img-num';
+    imgInput.placeholder = 'e.g. 1.jpeg';
+    imgInput.value       = fileFromSrc;
+    imgInput.style.cssText = 'width:110px;text-align:left;';
     imgInput.addEventListener('input', () => {
-      if (imgInput.value) {
-        thumb.src = IMG_BASE + imgInput.value + '.jpeg';
+      if (imgInput.value.trim()) {
+        thumb.src = IMG_BASE + imgInput.value.trim();
         thumb.classList.remove('preview-thumb-empty');
       } else {
         thumb.src = '';
@@ -256,6 +263,44 @@
       setStatus('Could not load products: ' + e.message, 'error');
     }
   }
+
+  function collectData() {
+    const rows = document.querySelectorAll('#table-body tr');
+    const data = [];
+    rows.forEach((tr, idx) => {
+      const inputs = tr.querySelectorAll('input');
+      if (inputs.length < 6) return; // skip placeholder rows
+      const file  = inputs[0].value.trim();
+      const price = parseFloat(inputs[1].value) || 0;
+      const S  = parseInt(inputs[2].value) || 0;
+      const M  = parseInt(inputs[3].value) || 0;
+      const L  = parseInt(inputs[4].value) || 0;
+      const XL = parseInt(inputs[5].value) || 0;
+      data.push({ id: idx + 1, src: file ? IMG_BASE + file : '', price, S, M, L, XL });
+    });
+    return data;
+  }
+
+  document.getElementById('save-btn').addEventListener('click', async () => {
+    const btn  = document.getElementById('save-btn');
+    const data = collectData();
+    btn.disabled = true;
+    setStatus('Saving…', 'info');
+    try {
+      const res = await fetch('/save', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data, null, 2)
+      });
+      if (!res.ok) throw new Error('Server returned ' + res.status);
+      setStatus('Saved! ' + data.length + ' products written to images_data.json', 'success');
+      setTimeout(clearStatus, 4000);
+    } catch (e) {
+      setStatus('Save failed: ' + e.message + ' — are you running server.py?', 'error');
+    } finally {
+      btn.disabled = false;
+    }
+  });
 
   document.getElementById('add-row').addEventListener('click', () => {
     document.getElementById('table-body').appendChild(createRow({}));
