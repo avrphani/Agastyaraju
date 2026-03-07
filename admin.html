@@ -1,0 +1,446 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Panel — Agastyaraju</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --rose: #c4607a; --dark: #1f1418; --mid: #6b3d50;
+      --cream: #fdf5f7; --warm: #f0e4e8; --muted: #9a7080;
+      --green: #3a7d55; --red: #c04040; --blue: #3a5a9a;
+    }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #f4f4f6; color: var(--dark); min-height: 100vh; }
+
+    /* NAV */
+    .admin-nav {
+      background: var(--dark); color: white;
+      padding: 0.9rem 2rem;
+      display: flex; align-items: center; justify-content: space-between;
+      position: sticky; top: 0; z-index: 50;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+    }
+    .admin-logo { font-size: 1.25rem; font-weight: 600; letter-spacing: 0.02em; }
+    .admin-logo em { color: var(--rose); font-style: italic; }
+    .admin-badge {
+      background: var(--rose); color: white; font-size: 0.65rem;
+      font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase;
+      padding: 0.25rem 0.6rem; border-radius: 2rem; margin-left: 0.7rem;
+      vertical-align: middle;
+    }
+    .settings-toggle-btn {
+      background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2);
+      color: white; padding: 0.5rem 1rem; border-radius: 0.5rem;
+      cursor: pointer; font-size: 0.85rem; transition: background 0.2s;
+    }
+    .settings-toggle-btn:hover { background: rgba(255,255,255,0.22); }
+
+    /* SETTINGS PANEL */
+    .settings-panel {
+      background: white; border-bottom: 1px solid #ddd;
+      padding: 1.5rem 2rem; display: none;
+    }
+    .settings-panel.open { display: block; }
+    .settings-panel h3 { font-size: 1rem; margin-bottom: 1.2rem; color: var(--mid); }
+    .settings-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; max-width: 800px; }
+    .field-group { display: flex; flex-direction: column; gap: 0.35rem; }
+    .field-group label { font-size: 0.75rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; }
+    .field-group input {
+      padding: 0.6rem 0.85rem; border: 1.5px solid #ddd; border-radius: 0.5rem;
+      font-size: 0.88rem; outline: none; transition: border-color 0.2s;
+    }
+    .field-group input:focus { border-color: var(--rose); }
+    .save-settings-btn {
+      margin-top: 1rem; background: var(--dark); color: white;
+      border: none; padding: 0.65rem 1.5rem; border-radius: 0.5rem;
+      cursor: pointer; font-size: 0.88rem; font-weight: 500; transition: background 0.2s;
+    }
+    .save-settings-btn:hover { background: var(--rose); }
+    .settings-help {
+      margin-top: 1.2rem; padding: 1rem 1.2rem;
+      background: #f8f4ff; border-left: 3px solid var(--blue);
+      border-radius: 0 0.5rem 0.5rem 0; font-size: 0.83rem;
+      color: #444; line-height: 1.6; max-width: 800px;
+    }
+    .settings-help strong { display: block; margin-bottom: 0.4rem; color: var(--blue); }
+    .settings-help p { margin-bottom: 0.4rem; }
+    .settings-help a { color: var(--blue); }
+
+    /* MAIN */
+    .admin-main { padding: 2rem; max-width: 1100px; margin: 0 auto; }
+    .admin-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;
+    }
+    .admin-header h1 { font-size: 1.4rem; font-weight: 600; color: var(--dark); }
+    .admin-actions { display: flex; gap: 0.75rem; }
+    .btn-add {
+      background: white; border: 1.5px solid var(--rose); color: var(--rose);
+      padding: 0.6rem 1.2rem; border-radius: 0.5rem; font-size: 0.88rem;
+      font-weight: 500; cursor: pointer; transition: all 0.2s;
+    }
+    .btn-add:hover { background: var(--rose); color: white; }
+    .btn-publish {
+      background: var(--green); color: white; border: none;
+      padding: 0.6rem 1.5rem; border-radius: 0.5rem; font-size: 0.88rem;
+      font-weight: 600; cursor: pointer; transition: background 0.2s; display: flex;
+      align-items: center; gap: 0.5rem;
+    }
+    .btn-publish:hover { background: #2d6343; }
+    .btn-publish:disabled { background: #aaa; cursor: not-allowed; }
+
+    /* STATUS BAR */
+    .status-bar {
+      padding: 0.75rem 1.1rem; border-radius: 0.5rem; margin-bottom: 1.2rem;
+      font-size: 0.88rem; font-weight: 500; display: none;
+    }
+    .status-bar.visible { display: block; }
+    .status-info    { background: #e8f0fe; color: var(--blue); border: 1px solid #b8d0fc; }
+    .status-success { background: #e6f4ec; color: var(--green); border: 1px solid #a8d8b8; }
+    .status-error   { background: #fde8e8; color: var(--red); border: 1px solid #f8b8b8; }
+
+    /* TABLE */
+    .table-wrap { background: white; border-radius: 0.75rem; box-shadow: 0 1px 8px rgba(0,0,0,0.07); overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; }
+    thead tr { background: var(--warm); }
+    th {
+      padding: 0.85rem 0.75rem; text-align: left;
+      font-size: 0.72rem; font-weight: 700; color: var(--mid);
+      text-transform: uppercase; letter-spacing: 0.1em;
+      border-bottom: 2px solid #e8d8e0;
+    }
+    td { padding: 0.65rem 0.75rem; border-bottom: 1px solid #f0e8ec; vertical-align: middle; }
+    tbody tr:last-child td { border-bottom: none; }
+    tbody tr:hover { background: #fdf7f8; }
+
+    .preview-thumb {
+      width: 56px; height: 72px; object-fit: cover;
+      border-radius: 0.4rem; display: block;
+      border: 1px solid #e0d0d8; background: var(--warm);
+    }
+    .preview-thumb[src=""] { opacity: 0; }
+
+    table input[type="number"] {
+      width: 70px; padding: 0.45rem 0.6rem;
+      border: 1.5px solid #ddd; border-radius: 0.4rem;
+      font-size: 0.9rem; outline: none; text-align: center;
+      transition: border-color 0.2s;
+    }
+    table input[type="number"]:focus { border-color: var(--rose); }
+    .price-input { width: 90px !important; }
+
+    .delete-btn {
+      background: none; border: 1.5px solid #e0c8d0; color: var(--muted);
+      width: 2rem; height: 2rem; border-radius: 50%;
+      cursor: pointer; font-size: 0.9rem; transition: all 0.2s;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .delete-btn:hover { background: #fee; border-color: var(--red); color: var(--red); }
+
+    /* NO-TOKEN BANNER */
+    .no-token-banner {
+      background: #fff8e8; border: 1.5px dashed #f0b840;
+      border-radius: 0.75rem; padding: 1.5rem; margin-bottom: 1.5rem;
+      font-size: 0.9rem; color: #7a5800;
+    }
+    .no-token-banner strong { display: block; margin-bottom: 0.4rem; font-size: 1rem; }
+
+    @media (max-width: 700px) {
+      .admin-main { padding: 1rem; }
+      .settings-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<nav class="admin-nav">
+  <div>
+    <span class="admin-logo">Agastya<em>raju</em></span>
+    <span class="admin-badge">Admin Panel</span>
+  </div>
+  <button class="settings-toggle-btn" id="settings-toggle">⚙ Settings</button>
+</nav>
+
+<!-- SETTINGS PANEL -->
+<div class="settings-panel" id="settings-panel">
+  <h3>One-time Setup</h3>
+  <div class="settings-grid">
+    <div class="field-group">
+      <label>GitHub Personal Access Token</label>
+      <input type="password" id="gh-token" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" autocomplete="off"/>
+    </div>
+    <div class="field-group">
+      <label>Netlify Deploy Hook URL <em style="font-weight:400;text-transform:none;letter-spacing:0">(optional — for auto-publish)</em></label>
+      <input type="text" id="netlify-hook" placeholder="https://api.netlify.com/build_hooks/..."/>
+    </div>
+  </div>
+  <button class="save-settings-btn" id="save-settings">💾 Save Settings</button>
+  <div class="settings-help">
+    <strong>How to get your GitHub Token:</strong>
+    <p>1. Go to <a href="https://github.com/settings/tokens" target="_blank">github.com → Settings → Developer Settings → Personal Access Tokens → Fine-grained tokens</a></p>
+    <p>2. Create a new token with <strong>Contents: Read and write</strong> access on the <strong>Agastyaraju</strong> repository.</p>
+    <br/>
+    <strong>How to get your Netlify Deploy Hook (enables instant website updates):</strong>
+    <p>1. Go to <a href="https://app.netlify.com/projects/agastyaraju/settings/deploys" target="_blank">Netlify → agastyaraju → Site settings → Build &amp; deploy → Build hooks</a></p>
+    <p>2. Click <strong>Add build hook</strong>, name it "Admin Panel", copy the URL and paste it above.</p>
+  </div>
+</div>
+
+<!-- MAIN -->
+<main class="admin-main">
+  <div id="no-token-banner" class="no-token-banner" style="display:none">
+    <strong>⚠ GitHub token not set</strong>
+    You can view and edit products below, but you won't be able to publish until you add your GitHub token. Click <strong>⚙ Settings</strong> above.
+  </div>
+
+  <div class="admin-header">
+    <h1>Product Catalogue</h1>
+    <div class="admin-actions">
+      <button class="btn-add" id="add-row">+ Add Product</button>
+      <button class="btn-publish" id="publish-btn">🚀 Publish to Website</button>
+    </div>
+  </div>
+
+  <div class="status-bar" id="status-bar"></div>
+
+  <div class="table-wrap">
+    <table id="product-table">
+      <thead>
+        <tr>
+          <th>Preview</th>
+          <th>Image #</th>
+          <th>Price (₹)</th>
+          <th>S</th>
+          <th>M</th>
+          <th>L</th>
+          <th>XL</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="table-body">
+        <tr><td colspan="8" style="text-align:center;padding:2rem;color:#aaa;font-style:italic">Loading products…</td></tr>
+      </tbody>
+    </table>
+  </div>
+</main>
+
+<script>
+  const REPO     = 'avrphani/Agastyaraju';
+  const FILE     = 'images_data.json';
+  const RAW_URL  = `https://raw.githubusercontent.com/${REPO}/main/${FILE}`;
+  const API_URL  = `https://api.github.com/repos/${REPO}/contents/${FILE}`;
+  const IMG_BASE = 'images/';
+
+  // ── Settings ──────────────────────────────────────────────────────────────
+  const settingsToggle = document.getElementById('settings-toggle');
+  const settingsPanel  = document.getElementById('settings-panel');
+  const ghTokenInput   = document.getElementById('gh-token');
+  const hookInput      = document.getElementById('netlify-hook');
+  const saveBtn        = document.getElementById('save-settings');
+
+  settingsToggle.addEventListener('click', () => settingsPanel.classList.toggle('open'));
+
+  function loadSettings() {
+    ghTokenInput.value = localStorage.getItem('gh_token') || '';
+    hookInput.value    = localStorage.getItem('netlify_hook') || '';
+    if (!localStorage.getItem('gh_token')) {
+      document.getElementById('no-token-banner').style.display = '';
+    }
+  }
+
+  saveBtn.addEventListener('click', () => {
+    localStorage.setItem('gh_token',      ghTokenInput.value.trim());
+    localStorage.setItem('netlify_hook',  hookInput.value.trim());
+    document.getElementById('no-token-banner').style.display = 'none';
+    settingsPanel.classList.remove('open');
+    setStatus('Settings saved!', 'success');
+  });
+
+  // ── Status bar ────────────────────────────────────────────────────────────
+  const statusBar = document.getElementById('status-bar');
+  function setStatus(msg, type) {
+    statusBar.textContent = msg;
+    statusBar.className = 'status-bar visible status-' + (type || 'info');
+  }
+  function clearStatus() {
+    statusBar.className = 'status-bar';
+  }
+
+  // ── Build one table row ───────────────────────────────────────────────────
+  function createRow(item) {
+    const tr = document.createElement('tr');
+
+    // Preview
+    const previewTd = document.createElement('td');
+    const thumbImg   = document.createElement('img');
+    thumbImg.className = 'preview-thumb';
+    thumbImg.src = item.src || '';
+    thumbImg.alt = '';
+    previewTd.appendChild(thumbImg);
+
+    // Image number
+    const imgTd    = document.createElement('td');
+    const imgInput = document.createElement('input');
+    imgInput.type  = 'number'; imgInput.min = 1; imgInput.className = 'img-num';
+    imgInput.value = item.id || '';
+    imgInput.addEventListener('input', () => {
+      thumbImg.src = imgInput.value ? `${IMG_BASE}${imgInput.value}.jpeg` : '';
+    });
+    imgTd.appendChild(imgInput);
+
+    // Price
+    const priceTd    = document.createElement('td');
+    const priceInput = document.createElement('input');
+    priceInput.type  = 'number'; priceInput.min = 0; priceInput.className = 'price-input';
+    priceInput.value = item.price != null ? item.price : '';
+    priceInput.placeholder = '0';
+    priceTd.appendChild(priceInput);
+
+    // Sizes
+    const sizeKeys = ['S', 'M', 'L', 'XL'];
+    const sizeTds  = sizeKeys.map(key => {
+      const td    = document.createElement('td');
+      const input = document.createElement('input');
+      input.type  = 'number'; input.min = 0; input.className = 'size-input';
+      input.value = item[key] != null ? item[key] : '';
+      input.placeholder = '0';
+      td.appendChild(input);
+      return td;
+    });
+
+    // Delete
+    const delTd  = document.createElement('td');
+    const delBtn = document.createElement('button');
+    delBtn.className   = 'delete-btn';
+    delBtn.textContent = '✕';
+    delBtn.title       = 'Remove this row';
+    delBtn.addEventListener('click', () => tr.remove());
+    delTd.appendChild(delBtn);
+
+    tr.appendChild(previewTd);
+    tr.appendChild(imgTd);
+    tr.appendChild(priceTd);
+    sizeTds.forEach(td => tr.appendChild(td));
+    tr.appendChild(delTd);
+    return tr;
+  }
+
+  // ── Collect table → JSON array ────────────────────────────────────────────
+  function collectData() {
+    const rows = document.querySelectorAll('#table-body tr');
+    const data = [];
+    let seq = 1;
+    rows.forEach(row => {
+      const imgNum = parseInt(row.querySelector('.img-num') && row.querySelector('.img-num').value);
+      if (!imgNum) return;
+      const sizeInputs = row.querySelectorAll('.size-input');
+      data.push({
+        id:    seq++,
+        src:   `${IMG_BASE}${imgNum}.jpeg`,
+        price: parseInt(row.querySelector('.price-input').value) || 0,
+        S:     parseInt(sizeInputs[0] && sizeInputs[0].value) || 0,
+        M:     parseInt(sizeInputs[1] && sizeInputs[1].value) || 0,
+        L:     parseInt(sizeInputs[2] && sizeInputs[2].value) || 0,
+        XL:    parseInt(sizeInputs[3] && sizeInputs[3].value) || 0
+      });
+    });
+    return data;
+  }
+
+  // ── Load data from GitHub raw URL ─────────────────────────────────────────
+  async function loadData() {
+    try {
+      setStatus('Loading current catalogue…', 'info');
+      const res = await fetch(RAW_URL + '?t=' + Date.now());
+      if (!res.ok) throw new Error('Could not load data from GitHub');
+      const data = await res.json();
+      const tbody = document.getElementById('table-body');
+      tbody.innerHTML = '';
+      data.forEach(item => tbody.appendChild(createRow(item)));
+      clearStatus();
+    } catch (e) {
+      setStatus('Could not load data. Make sure the repo is public and images_data.json exists.', 'error');
+    }
+  }
+
+  // ── Add row button ────────────────────────────────────────────────────────
+  document.getElementById('add-row').addEventListener('click', () => {
+    document.getElementById('table-body').appendChild(createRow({}));
+  });
+
+  // ── Publish ───────────────────────────────────────────────────────────────
+  document.getElementById('publish-btn').addEventListener('click', async () => {
+    const token = localStorage.getItem('gh_token');
+    if (!token) {
+      setStatus('⚠ No GitHub token set. Open ⚙ Settings and add your token first.', 'error');
+      settingsPanel.classList.add('open');
+      return;
+    }
+
+    const newData = collectData();
+    if (!newData.length) {
+      setStatus('⚠ Nothing to save — add at least one row.', 'error');
+      return;
+    }
+
+    const publishBtn = document.getElementById('publish-btn');
+    publishBtn.disabled = true;
+    setStatus('Step 1/3 — Reading current file from GitHub…', 'info');
+
+    try {
+      // 1. Get current file SHA (required by GitHub API to update a file)
+      const metaRes = await fetch(API_URL, {
+        headers: { Authorization: `token ${token}`, Accept: 'application/vnd.github.v3+json' }
+      });
+      if (metaRes.status === 401) throw new Error('Invalid GitHub token. Please check your token in Settings.');
+      if (metaRes.status === 404) throw new Error('File not found on GitHub. Make sure images_data.json exists in the repo.');
+      if (!metaRes.ok) throw new Error('GitHub API error: ' + metaRes.status);
+      const meta = await metaRes.json();
+
+      setStatus('Step 2/3 — Saving changes to GitHub…', 'info');
+
+      // 2. Base64-encode (handle UTF-8 / ₹ symbol)
+      const jsonStr  = JSON.stringify(newData, null, 2);
+      const encoded  = btoa(unescape(encodeURIComponent(jsonStr)));
+
+      // 3. Push update
+      const putRes = await fetch(API_URL, {
+        method: 'PUT',
+        headers: { Authorization: `token ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message: 'Update product catalogue via Admin Panel',
+          content: encoded,
+          sha: meta.sha
+        })
+      });
+      if (!putRes.ok) {
+        const err = await putRes.json();
+        throw new Error('GitHub save failed: ' + (err.message || putRes.status));
+      }
+
+      setStatus('Step 3/3 — Triggering website deploy…', 'info');
+
+      // 4. Trigger Netlify deploy hook if configured
+      const hookUrl = localStorage.getItem('netlify_hook');
+      if (hookUrl) {
+        await fetch(hookUrl, { method: 'POST' });
+        setStatus('✅ Published! Your website will update in about 1 minute.', 'success');
+      } else {
+        setStatus('✅ Saved to GitHub! Add a Netlify Deploy Hook in Settings to automatically update the website too.', 'success');
+      }
+
+    } catch (e) {
+      setStatus('❌ ' + e.message, 'error');
+    } finally {
+      publishBtn.disabled = false;
+    }
+  });
+
+  // ── Init ──────────────────────────────────────────────────────────────────
+  loadSettings();
+  loadData();
+</script>
+</body>
+</html>

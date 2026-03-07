@@ -15,7 +15,20 @@ document.addEventListener('DOMContentLoaded', () => {
     data.forEach((item, idx) => {
       const card = document.createElement('div');
       card.className = 'gallery-card';
-      card.innerHTML = `<img src="${item.src}" alt="Style ${item.id}" loading="lazy" />`;
+
+      const img = document.createElement('img');
+      img.src     = item.src;
+      img.alt     = 'Style ' + item.id;
+      img.loading = 'lazy';
+      card.appendChild(img);
+
+      if (item.price) {
+        const tag = document.createElement('div');
+        tag.className   = 'price-tag';
+        tag.textContent = '\u20B9' + item.price.toLocaleString('en-IN');
+        card.appendChild(tag);
+      }
+
       card.addEventListener('click', () => openLightbox(idx));
       grid.appendChild(card);
     });
