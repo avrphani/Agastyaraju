@@ -1,84 +1,72 @@
-// Filter pills
-const pills = document.querySelectorAll('.pill');
-pills.forEach(pill => {
-  pill.addEventListener('click', () => {
-    pills.forEach(p => p.classList.remove('active'));
-    pill.classList.add('active');
-  });
-});
+﻿// Load images from the pre-built JSON (generated from Excel cont.xlsx)
+// This approach is Netlify-safe: no directory listing needed, just a static JSON fetch.
+document.addEventListener('DOMContentLoaded', () => {
+  const grid = document.getElementById('gallery-grid');
+  let images = [];
+  let currentIndex = 0;
 
-// Wishlist toggle
-const wishButtons = document.querySelectorAll('.wishlist-btn');
-wishButtons.forEach(btn => {
-  btn.addEventListener('click', () => {
-    btn.textContent = btn.textContent === '🤍' ? '❤️' : '🤍';
-  });
-});
-
-// Cart counter
-let cartCount = 0;
-const cartBtn = document.querySelector('.nav-cart');
-document.querySelectorAll('.add-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    cartCount++;
-    cartBtn.textContent = `🛒 Cart (${cartCount})`;
-    btn.textContent = '✓ Added';
-    btn.style.background = '#5a8c60';
-    setTimeout(() => { btn.textContent = 'Add +'; btn.style.background = ''; }, 1500);
-  });
-});
-
-// Scroll animation
-const observer = new IntersectionObserver((entries) => {
-  entries.forEach(e => { if (e.isIntersecting) e.target.style.opacity = '1'; });
-}, { threshold: 0.1 });
-
-document.querySelectorAll('.product-card, .category-card').forEach(el => {
-  el.style.opacity = '0';
-  el.style.transition = 'opacity 0.5s ease, transform 0.3s ease, box-shadow 0.3s ease';
-  observer.observe(el);
-});
-
-// load images: fill product cards and gallery from images folder
-function loadImages() {
-  fetch('images/')
-    .then(r => r.text())
-    .then(html => {
-      const parser = new DOMParser();
-      const doc = parser.parseFromString(html, 'text/html');
-      const imageNames = [...doc.querySelectorAll('a')]
-        .map(a => a.getAttribute('href'))
-        .filter(h => /\.(jpe?g|png|webp)$/i.test(h));
-      
-      // replace product-img-bg divs with actual img tags
-      const productBgs = document.querySelectorAll('.product-img-bg');
-      productBgs.forEach((el, idx) => {
-        if (idx < imageNames.length) {
-          const img = document.createElement('img');
-          img.src = `images/${imageNames[idx]}`;
-          img.alt = `Product ${idx + 1}`;
-          img.style.width = '100%';
-          img.style.height = '100%';
-          img.style.objectFit = 'cover';
-          el.replaceWith(img);
-        }
-      });
-      
-      // fill gallery thumbnails
-      const container = document.getElementById('gallery');
-      if (container) {
-        imageNames.forEach(name => {
-          const img = document.createElement('img');
-          img.src = `images/${name}`;
-          img.className = 'thumb';
-          img.alt = name;
-          container.appendChild(img);
-        });
-      }
-    })
-    .catch(err => {
-      console.error('image load failed', err);
+  // --- Build thumbnails ---
+  function buildGallery(data) {
+    grid.innerHTML = '';
+    if (!data.length) {
+      grid.innerHTML = '<p class="gallery-empty">No images found.</p>';
+      return;
+    }
+    data.forEach((item, idx) => {
+      const card = document.createElement('div');
+      card.className = 'gallery-card';
+      card.innerHTML = `<img src="${item.src}" alt="Style ${item.id}" loading="lazy" />`;
+      card.addEventListener('click', () => openLightbox(idx));
+      grid.appendChild(card);
     });
-}
+  }
 
-document.addEventListener('DOMContentLoaded', loadImages);
+  // --- Lightbox ---
+  const lightbox  = document.getElementById('lightbox');
+  const lbImg     = document.getElementById('lightbox-img');
+  const lbClose   = document.getElementById('lightbox-close');
+  const lbPrev    = document.getElementById('lightbox-prev');
+  const lbNext    = document.getElementById('lightbox-next');
+
+  function openLightbox(idx) {
+    currentIndex = idx;
+    lbImg.src = images[idx].src;
+    lbImg.alt = `Style ${images[idx].id}`;
+    lightbox.classList.add('active');
+  }
+
+  function closeLightbox() {
+    lightbox.classList.remove('active');
+    lbImg.src = '';
+  }
+
+  lbClose.addEventListener('click', closeLightbox);
+  lightbox.addEventListener('click', (e) => { if (e.target === lightbox) closeLightbox(); });
+
+  lbPrev.addEventListener('click', (e) => {
+    e.stopPropagation();
+    currentIndex = (currentIndex - 1 + images.length) % images.length;
+    lbImg.src = images[currentIndex].src;
+  });
+
+  lbNext.addEventListener('click', (e) => {
+    e.stopPropagation();
+    currentIndex = (currentIndex + 1) % images.length;
+    lbImg.src = images[currentIndex].src;
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (!lightbox.classList.contains('active')) return;
+    if (e.key === 'ArrowRight') lbNext.click();
+    if (e.key === 'ArrowLeft')  lbPrev.click();
+    if (e.key === 'Escape')     closeLightbox();
+  });
+
+  // --- Fetch JSON (Netlify serves this as a static file) ---
+  fetch('images_data.json')
+    .then(r => { if (!r.ok) throw new Error('JSON not found'); return r.json(); })
+    .then(data => { images = data; buildGallery(data); })
+    .catch(() => {
+      grid.innerHTML = '<p class="gallery-empty">Could not load images. Please try again later.</p>';
+    });
+});
