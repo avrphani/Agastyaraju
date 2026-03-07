@@ -1,13 +1,13 @@
 ﻿*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --cream: #faf7f2;
-  --warm: #f0e8d8;
-  --clay: #c4804a;
-  --rust: #a85f30;
-  --dark: #1c1410;
-  --mid: #5a4030;
-  --light-text: #8a7060;
+  --cream: #fdf5f7;
+  --warm: #f7edf0;
+  --clay: #c4607a;
+  --rust: #a04060;
+  --dark: #1f1418;
+  --mid: #6b3d50;
+  --light-text: #9a7080;
   --white: #ffffff;
 }
 
@@ -234,10 +234,10 @@ nav {
   font-size: 4rem;
   position: relative;
 }
-.cat-bg-men    { background: linear-gradient(160deg, #d4c4b0, #b8a080); }
-.cat-bg-women  { background: linear-gradient(160deg, #e8cfc0, #d4a890); }
-.cat-bg-kids   { background: linear-gradient(160deg, #c8d8c0, #a8c090); }
-.cat-bg-ethnic { background: linear-gradient(160deg, #d8c0d0, #c090b0); }
+.cat-bg-sarees  { background: linear-gradient(160deg, #e8d4b0, #d4a870); }
+.cat-bg-kurtas  { background: linear-gradient(160deg, #f0d0d8, #dca8b8); }
+.cat-bg-party   { background: linear-gradient(160deg, #d8c0d8, #b890c0); }
+.cat-bg-casual  { background: linear-gradient(160deg, #c8d8c8, #a8c4a0); }
 
 .cat-overlay {
   position: absolute; inset: 0;
