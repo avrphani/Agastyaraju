@@ -34,7 +34,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Fetch JSON (Netlify serves this as a static file; server.py handles it locally)
+  // Fetch JSON (Vercel serves this as a static file; server.py handles it locally)
   fetch('images_data.json?t=' + Date.now())
     .then(r => { if (!r.ok) throw new Error('JSON not found'); return r.json(); })
     .then(data => buildGallery(data))

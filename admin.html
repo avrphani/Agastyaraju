@@ -293,10 +293,15 @@
         body: JSON.stringify(data, null, 2)
       });
       if (!res.ok) throw new Error('Server returned ' + res.status);
-      setStatus('Saved! ' + data.length + ' products written to images_data.json', 'success');
-      setTimeout(clearStatus, 4000);
+      const result = await res.json().catch(() => ({}));
+      if (result.note) {
+        setStatus('ℹ️ ' + result.note, 'info');
+      } else {
+        setStatus('Saved! ' + data.length + ' products written to images_data.json', 'success');
+        setTimeout(clearStatus, 4000);
+      }
     } catch (e) {
-      setStatus('Save failed: ' + e.message + ' — are you running server.py?', 'error');
+      setStatus('Save failed: ' + e.message + ' — are you running server.py locally?', 'error');
     } finally {
       btn.disabled = false;
     }
