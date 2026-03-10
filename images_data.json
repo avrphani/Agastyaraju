@@ -1,58 +1,7 @@
 [
   {
     "id": 1,
-    "src": "images/Anarkali_RM_1008.jpeg",
-    "price": ,
-    "S": 0,
-    "M": 0,
-    "L": 1,
-    "XL": 1,
-    "XXL":0
-  },
-{
-    "id": 1,
-    "src": "images/Anarkali_RM_1009.jpeg",
-    "price": 900,
-    "S": 0,
-    "M": 0,
-    "L": 0,
-    "XL": 0,
-    "XXL": 1
-  },
-{
-    "id": 1,
-    "src": "images/Anarkali_RM_1010.jpeg",
-    "price": 900,
-    "S": 0,
-    "M": 0,
-    "L": 1,
-    "XL": 0,
-    "XXL": 1
-  },
-{
-    "id": 1,
-    "src": "images/Anarkali_RM_1011.jpeg",
-    "price": 900,
-    "S": 0,
-    "M": 0,
-    "L": 0,
-    "XL": 1,
-    "XXL": 0
-  },
-{
-    "id": 1,
-    "src": "images/Anarkali_RM_1012.jpeg",
-    "price": 900,
-    "S": 0,
-    "M": 0,
-    "L": 0,
-    "XL": 0,
-    "XXL": 1
-  },
-
-{
-    "id": 1,
-    "src": "images/Anarkali_RM_1013.jpeg",
+    "src": "images/Anarkali_RM_1008.jpg",
     "price": 900,
     "S": 0,
     "M": 0,
@@ -60,9 +9,9 @@
     "XL": 1,
     "XXL": 0
   },
-{
-    "id": 1,
-    "src": "images/Anarkali_RM_1014.jpeg",
+  {
+    "id": 2,
+    "src": "images/Anarkali_RM_1009.jpg",
     "price": 900,
     "S": 0,
     "M": 0,
@@ -70,9 +19,59 @@
     "XL": 0,
     "XXL": 1
   },
-{
-    "id": 1,
-    "src": "images/Anarkali_RM_1015.jpeg",
+  {
+    "id": 3,
+    "src": "images/Anarkali_RM_1010.jpg",
+    "price": 900,
+    "S": 0,
+    "M": 0,
+    "L": 1,
+    "XL": 0,
+    "XXL": 1
+  },
+  {
+    "id": 4,
+    "src": "images/Anarkali_RM_1011.jpg",
+    "price": 900,
+    "S": 0,
+    "M": 0,
+    "L": 0,
+    "XL": 1,
+    "XXL": 0
+  },
+  {
+    "id": 5,
+    "src": "images/Anarkali_RM_1012.jpg",
+    "price": 900,
+    "S": 0,
+    "M": 0,
+    "L": 0,
+    "XL": 0,
+    "XXL": 1
+  },
+  {
+    "id": 6,
+    "src": "images/Anarkali_RM_1013.jpg",
+    "price": 900,
+    "S": 0,
+    "M": 0,
+    "L": 1,
+    "XL": 1,
+    "XXL": 0
+  },
+  {
+    "id": 7,
+    "src": "images/Anarkali_RM_1014.jpg",
+    "price": 900,
+    "S": 0,
+    "M": 0,
+    "L": 0,
+    "XL": 0,
+    "XXL": 1
+  },
+  {
+    "id": 8,
+    "src": "images/Anarkali_RM_1015.jpg",
     "price": 900,
     "S": 0,
     "M": 0,
@@ -80,9 +79,9 @@
     "XL": 0,
     "XXL": 0
   },
-{
-    "id": 1,
-    "src": "images/Anarkali_RM_1016.jpeg",
+  {
+    "id": 9,
+    "src": "images/Anarkali_RM_1016.jpg",
     "price": 900,
     "S": 0,
     "M": 0,
@@ -90,14 +89,14 @@
     "XL": 0,
     "XXL": 1
   },
-{
-    "id": 1,
-    "src": "images/Anarkali_RM_1017.jpeg",
+  {
+    "id": 10,
+    "src": "images/Anarkali_RM_1017.jpg",
     "price": 900,
     "S": 0,
     "M": 0,
     "L": 1,
     "XL": 0,
     "XXL": 1
-  },
+  }
 ]
